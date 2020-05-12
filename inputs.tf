@@ -15,3 +15,21 @@ variable "nomad_max_lease_ttl" {
   description = "Max token TTL for Nomad tokens"
   default     = 28800
 }
+
+variable "configure_for_consul" {
+  type        = bool
+  description = "Configure base policies for use with Consul."
+  default     = true
+}
+
+variable "consul_default_lease_ttl" {
+  type        = number
+  description = "Default token TTL for Consul tokens"
+  default     = 3600
+}
+
+variable "consul_max_lease_ttl" {
+  type        = number
+  description = "Max token TTL for Consul tokens"
+  default     = 28800
+}
