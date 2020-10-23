@@ -57,3 +57,15 @@ resource "vault_generic_endpoint" "nomad_role_root" {
     policies = ["root"]
   })
 }
+
+resource "vault_generic_endpoint" "nomad_role_management" {
+  count      = var.configure_for_nomad ? 1 : 0
+  depends_on = [vault_mount.nomad]
+
+  path                 = "nomad/role/management"
+  ignore_absent_fields = true
+
+  data_json = jsonencode({
+    type = "management"
+  })
+}
