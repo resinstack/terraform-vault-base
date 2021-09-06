@@ -86,6 +86,21 @@ data "vault_policy_document" "root" {
   }
 
   rule {
+    path = "sys/plugins/*"
+
+    capabilities = [
+      "create",
+      "read",
+      "update",
+      "delete",
+      "list",
+      "sudo",
+    ]
+
+    description = "Manage plugin parameters"
+  }
+
+  rule {
     path = "secret/*"
 
     capabilities = [
