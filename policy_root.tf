@@ -152,6 +152,20 @@ data "vault_policy_document" "root" {
 
     description = "Read health checks"
   }
+
+  rule {
+    path = "identity/*"
+    capabilities = [
+      "create",
+      "read",
+      "update",
+      "delete",
+      "list",
+      "sudo",
+    ]
+
+    description = "Allow management of identity systems."
+  }
 }
 
 resource "vault_policy" "root" {
