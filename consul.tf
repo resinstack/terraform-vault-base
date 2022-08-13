@@ -44,3 +44,63 @@ resource "vault_generic_endpoint" "consul_role_root" {
     policies = ["global-management"]
   })
 }
+
+resource "vault_generic_endpoint" "consul_role_agent" {
+  count      = var.configure_for_consul ? 1 : 0
+  depends_on = [vault_mount.consul]
+
+  path                 = "consul/roles/agent"
+  ignore_absent_fields = true
+
+  data_json = jsonencode({
+    policies = ["resin-consul-agent"]
+  })
+}
+
+data "vault_policy_document" "consul_agent" {
+  rule {
+    path         = "resin_internal/data/consul/gossip"
+    capabilities = ["read"]
+    description  = "Consul gossip key"
+  }
+
+  rule {
+    path         = "consul/creds/agent"
+    capabilities = ["read"]
+    description  = "Consul agent role"
+  }
+}
+
+resource "vault_policy" "consul_agent" {
+  count = var.configure_for_consul ? 1 : 0
+
+  name   = "resin-consul-agent"
+  policy = data.vault_policy_document.consul_agent.hcl
+}
+
+resource "vault_generic_endpoint" "consul_role_vault" {
+  count      = var.configure_for_consul ? 1 : 0
+  depends_on = [vault_mount.consul]
+
+  path                 = "consul/roles/vault"
+  ignore_absent_fields = true
+
+  data_json = jsonencode({
+    policies = ["resin-vault-server"]
+  })
+}
+
+data "vault_policy_document" "vault_server" {
+  rule {
+    path         = "consul/creds/vault"
+    capabilities = ["read"]
+    description  = "Vault server role"
+  }
+}
+
+resource "vault_policy" "vault_server" {
+  count = var.configure_for_consul ? 1 : 0
+
+  name   = "resin-vault-server"
+  policy = data.vault_policy_document.vault_server.hcl
+}
