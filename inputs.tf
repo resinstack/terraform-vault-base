@@ -33,3 +33,15 @@ variable "consul_max_lease_ttl" {
   description = "Max token TTL for Consul tokens"
   default     = 28800
 }
+
+variable "vault_cert_ca_file" {
+  type        = string
+  description = "File for certificate auth CA"
+  default     = "root_ca.pem"
+}
+
+variable "vault_role_policy_map" {
+  type        = map(set(string))
+  description = "Mapping of role maps"
+  default     = {}
+}
