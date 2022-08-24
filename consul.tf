@@ -90,17 +90,26 @@ resource "vault_generic_endpoint" "consul_role_vault" {
   })
 }
 
-data "vault_policy_document" "vault_server" {
-  rule {
-    path         = "consul/creds/vault"
-    capabilities = ["read"]
-    description  = "Vault server role"
-  }
+resource "vault_generic_endpoint" "consul_role_nomad_client" {
+  count      = (var.configure_for_consul && var.configure_for_nomad) ? 1 : 0
+  depends_on = [vault_mount.consul]
+
+  path                 = "consul/roles/nomad-client"
+  ignore_absent_fields = true
+
+  data_json = jsonencode({
+    policies = ["resin-nomad-client"]
+  })
 }
 
-resource "vault_policy" "vault_server" {
-  count = var.configure_for_consul ? 1 : 0
+resource "vault_generic_endpoint" "consul_role_nomad_server" {
+  count      = (var.configure_for_consul && var.configure_for_nomad) ? 1 : 0
+  depends_on = [vault_mount.consul]
 
-  name   = "resin-vault-server"
-  policy = data.vault_policy_document.vault_server.hcl
+  path                 = "consul/roles/nomad-server"
+  ignore_absent_fields = true
+
+  data_json = jsonencode({
+    policies = ["resin-nomad-server"]
+  })
 }
