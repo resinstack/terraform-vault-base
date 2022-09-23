@@ -16,6 +16,12 @@ variable "nomad_max_lease_ttl" {
   default     = 28800
 }
 
+variable "nomad_mint_global_tokens" {
+  type        = bool
+  description = "Mint global tokens for default roles"
+  default     = false
+}
+
 variable "configure_for_consul" {
   type        = bool
   description = "Configure base policies for use with Consul."

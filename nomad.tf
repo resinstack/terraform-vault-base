@@ -55,6 +55,7 @@ resource "vault_generic_endpoint" "nomad_role_root" {
 
   data_json = jsonencode({
     policies = ["root"]
+    global   = var.nomad_mint_global_tokens
   })
 }
 
@@ -66,6 +67,7 @@ resource "vault_generic_endpoint" "nomad_role_management" {
   ignore_absent_fields = true
 
   data_json = jsonencode({
-    type = "management"
+    type   = "management"
+    global = var.nomad_mint_global_tokens
   })
 }
