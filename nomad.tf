@@ -22,52 +22,32 @@ resource "vault_policy" "nomad_root" {
   policy = data.vault_policy_document.nomad_root.hcl
 }
 
-resource "vault_mount" "nomad" {
+resource "vault_nomad_secret_backend" "nomad" {
   count = var.configure_for_nomad ? 1 : 0
 
-  path        = "nomad/"
-  type        = "nomad"
   description = "Provide tokens for nomad"
+  address     = var.nomad_address
 
   default_lease_ttl_seconds = var.nomad_default_lease_ttl
   max_lease_ttl_seconds     = var.nomad_max_lease_ttl
+  ttl                       = var.nomad_default_lease_ttl
+  max_ttl                   = var.nomad_max_lease_ttl
 }
 
-resource "vault_generic_endpoint" "nomad_token_ttl" {
-  count      = var.configure_for_nomad ? 1 : 0
-  depends_on = [vault_mount.nomad]
+resource "vault_nomad_secret_role" "nomad_root" {
+  count   = var.configure_for_nomad ? 1 : 0
+  backend = vault_nomad_secret_backend.nomad[0].backend
 
-  path                 = "nomad/config/lease"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    ttl     = var.nomad_default_lease_ttl
-    max_ttl = var.nomad_max_lease_ttl
-  })
+  role     = "root"
+  policies = ["root"]
+  global   = var.nomad_mint_global_tokens
 }
 
-resource "vault_generic_endpoint" "nomad_role_root" {
-  count      = var.configure_for_nomad ? 1 : 0
-  depends_on = [vault_mount.nomad]
+resource "vault_nomad_secret_role" "nomad_management" {
+  count   = var.configure_for_nomad ? 1 : 0
+  backend = vault_nomad_secret_backend.nomad[0].backend
 
-  path                 = "nomad/role/root"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["root"]
-    global   = var.nomad_mint_global_tokens
-  })
-}
-
-resource "vault_generic_endpoint" "nomad_role_management" {
-  count      = var.configure_for_nomad ? 1 : 0
-  depends_on = [vault_mount.nomad]
-
-  path                 = "nomad/role/management"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    type   = "management"
-    global = var.nomad_mint_global_tokens
-  })
+  role   = "management"
+  type   = "management"
+  global = var.nomad_mint_global_tokens
 }

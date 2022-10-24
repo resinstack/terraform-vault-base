@@ -4,6 +4,12 @@ variable "configure_for_nomad" {
   default     = true
 }
 
+variable "nomad_address" {
+  type        = string
+  description = "Nomad API Address"
+  default     = "http://localhost:4646"
+}
+
 variable "nomad_default_lease_ttl" {
   type        = number
   description = "Default token TTL for Nomad tokens"

@@ -28,7 +28,7 @@ data "vault_policy_document" "consul_root" {
 }
 
 resource "vault_policy" "consul_root" {
-  count   = var.configure_for_consul ? 1 : 0
+  count = var.configure_for_consul ? 1 : 0
 
   name   = "resin-consul-root"
   policy = data.vault_policy_document.consul_root.hcl
