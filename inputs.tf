@@ -28,6 +28,18 @@ variable "configure_for_consul" {
   default     = true
 }
 
+variable "consul_address" {
+  type        = string
+  description = "Consul API address"
+  default     = "http://localhost:8500"
+}
+
+variable "consul_bootstrap" {
+  type        = bool
+  description = "Bootstrap the Consul ACL system"
+  default     = false
+}
+
 variable "consul_default_lease_ttl" {
   type        = number
   description = "Default token TTL for Consul tokens"

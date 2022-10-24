@@ -1,9 +1,10 @@
-resource "vault_mount" "consul" {
+resource "vault_consul_secret_backend" "consul" {
   count = var.configure_for_consul ? 1 : 0
 
-  type        = "consul"
-  path        = "consul/"
+  path        = "consul"
   description = "Provide tokens for consul"
+  address     = var.consul_address
+  bootstrap   = var.consul_bootstrap
 
   default_lease_ttl_seconds = var.consul_default_lease_ttl
   max_lease_ttl_seconds     = var.consul_max_lease_ttl
@@ -27,34 +28,26 @@ data "vault_policy_document" "consul_root" {
 }
 
 resource "vault_policy" "consul_root" {
-  count = var.configure_for_consul ? 1 : 0
+  count   = var.configure_for_consul ? 1 : 0
 
   name   = "resin-consul-root"
   policy = data.vault_policy_document.consul_root.hcl
 }
 
-resource "vault_generic_endpoint" "consul_role_root" {
-  count      = var.configure_for_consul ? 1 : 0
-  depends_on = [vault_mount.consul]
+resource "vault_consul_secret_backend_role" "consul_role_root" {
+  count   = var.configure_for_consul ? 1 : 0
+  backend = vault_consul_secret_backend.consul[0].path
 
-  path                 = "consul/roles/root"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["global-management"]
-  })
+  name            = "root"
+  consul_policies = ["global-management"]
 }
 
-resource "vault_generic_endpoint" "consul_role_agent" {
-  count      = var.configure_for_consul ? 1 : 0
-  depends_on = [vault_mount.consul]
+resource "vault_consul_secret_backend_role" "consul_role_agent" {
+  count   = var.configure_for_consul ? 1 : 0
+  backend = vault_consul_secret_backend.consul[0].path
 
-  path                 = "consul/roles/agent"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["resin-consul-agent"]
-  })
+  name            = "agent"
+  consul_policies = ["resin-consul-agent"]
 }
 
 data "vault_policy_document" "consul_agent" {
@@ -78,38 +71,26 @@ resource "vault_policy" "consul_agent" {
   policy = data.vault_policy_document.consul_agent.hcl
 }
 
-resource "vault_generic_endpoint" "consul_role_vault" {
-  count      = var.configure_for_consul ? 1 : 0
-  depends_on = [vault_mount.consul]
+resource "vault_consul_secret_backend_role" "consul_role_vault" {
+  count   = var.configure_for_consul ? 1 : 0
+  backend = vault_consul_secret_backend.consul[0].path
 
-  path                 = "consul/roles/vault"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["resin-vault-server"]
-  })
+  name            = "vault"
+  consul_policies = ["resin-vault-server"]
 }
 
-resource "vault_generic_endpoint" "consul_role_nomad_client" {
-  count      = (var.configure_for_consul && var.configure_for_nomad) ? 1 : 0
-  depends_on = [vault_mount.consul]
+resource "vault_consul_secret_backend_role" "consul_role_nomad_client" {
+  count   = var.configure_for_consul ? 1 : 0
+  backend = vault_consul_secret_backend.consul[0].path
 
-  path                 = "consul/roles/nomad-client"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["resin-nomad-client"]
-  })
+  name            = "nomad-client"
+  consul_policies = ["resin-nomad-client"]
 }
 
-resource "vault_generic_endpoint" "consul_role_nomad_server" {
-  count      = (var.configure_for_consul && var.configure_for_nomad) ? 1 : 0
-  depends_on = [vault_mount.consul]
+resource "vault_consul_secret_backend_role" "consul_role_nomad_server" {
+  count   = var.configure_for_consul ? 1 : 0
+  backend = vault_consul_secret_backend.consul[0].path
 
-  path                 = "consul/roles/nomad-server"
-  ignore_absent_fields = true
-
-  data_json = jsonencode({
-    policies = ["resin-nomad-server"]
-  })
+  name            = "nomad-server"
+  consul_policies = ["resin-nomad-server"]
 }
