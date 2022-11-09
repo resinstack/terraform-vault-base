@@ -16,14 +16,14 @@ data "vault_policy_document" "nomad_root" {
 }
 
 resource "vault_policy" "nomad_root" {
-  count = var.configure_for_nomad ? 1 : 0
+  count = var.configure_for_nomad_acl ? 1 : 0
 
   name   = "resin-nomad-root"
   policy = data.vault_policy_document.nomad_root.hcl
 }
 
 resource "vault_nomad_secret_backend" "nomad" {
-  count = var.configure_for_nomad ? 1 : 0
+  count = var.configure_for_nomad_acl ? 1 : 0
 
   description = "Provide tokens for nomad"
   address     = var.nomad_address
@@ -35,7 +35,7 @@ resource "vault_nomad_secret_backend" "nomad" {
 }
 
 resource "vault_nomad_secret_role" "nomad_root" {
-  count   = var.configure_for_nomad ? 1 : 0
+  count   = var.configure_for_nomad_acl ? 1 : 0
   backend = vault_nomad_secret_backend.nomad[0].backend
 
   role     = "root"
@@ -44,7 +44,7 @@ resource "vault_nomad_secret_role" "nomad_root" {
 }
 
 resource "vault_nomad_secret_role" "nomad_management" {
-  count   = var.configure_for_nomad ? 1 : 0
+  count   = var.configure_for_nomad_acl ? 1 : 0
   backend = vault_nomad_secret_backend.nomad[0].backend
 
   role   = "management"

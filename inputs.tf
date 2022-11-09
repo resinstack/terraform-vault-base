@@ -4,6 +4,12 @@ variable "configure_for_nomad" {
   default     = true
 }
 
+variable "configure_for_nomad_acl" {
+  type        = bool
+  description = "Configure nomad secrets engine"
+  default     = true
+}
+
 variable "nomad_address" {
   type        = string
   description = "Nomad API Address"
