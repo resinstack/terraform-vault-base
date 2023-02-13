@@ -1,4 +1,6 @@
 resource "vault_auth_backend" "fleet_auth" {
+  count = var.configure_machine_certauth ? 1 : 0
+
   path = "resin_fleet"
   type = "cert"
 
@@ -10,7 +12,7 @@ resource "vault_cert_auth_backend_role" "roles" {
 
   name           = each.key
   certificate    = file(lookup(each.value, "certificate"))
-  backend        = vault_auth_backend.fleet_auth.path
+  backend        = vault_auth_backend.fleet_auth[0].path
   token_ttl      = var.machine_auth_ttl
   token_max_ttl  = var.machine_auth_max_ttl
   token_policies = lookup(each.value, "policies")

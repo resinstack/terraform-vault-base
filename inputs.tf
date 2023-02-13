@@ -64,6 +64,12 @@ variable "consul_max_lease_ttl" {
   default     = 28800
 }
 
+variable "configure_machine_certauth" {
+  type        = bool
+  description = "Configure cert based machine auth"
+  default     = true
+}
+
 variable "vault_role_policy_map" {
   type = map(object({
     certificate   = string
