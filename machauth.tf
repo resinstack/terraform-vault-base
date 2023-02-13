@@ -11,8 +11,8 @@ resource "vault_cert_auth_backend_role" "roles" {
   name           = each.key
   certificate    = file(lookup(each.value, "certificate"))
   backend        = vault_auth_backend.fleet_auth.path
-  token_ttl      = 300
-  token_max_ttl  = 600
+  token_ttl      = var.machine_auth_ttl
+  token_max_ttl  = var.machine_auth_max_ttl
   token_policies = lookup(each.value, "policies")
 
   allowed_names = lookup(each.value, "allowed_names", null)

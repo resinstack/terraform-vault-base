@@ -73,3 +73,15 @@ variable "vault_role_policy_map" {
   description = "Mapping of role maps"
   default     = {}
 }
+
+variable "machine_auth_ttl" {
+  type        = number
+  description = "Default TTL for tokens"
+  default     = 300
+}
+
+variable "machine_auth_max_ttl" {
+  type        = number
+  description = "Max TTL for machine authenticated tokens"
+  default     = 600
+}
